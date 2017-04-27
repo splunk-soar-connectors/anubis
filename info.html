@@ -1,0 +1,75 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block title_color %}{{ title_color|default:'white' }}{% endblock %}
+{% block title_text_color %}{{ title_text_color|default:'rgb(101, 71, 150)' }}{% endblock %}
+{% block body_color %}{{ body_color|default:'white' }}{% endblock %}
+{% block body_text_color %}{{ body_text_color|default:'black' }}{% endblock %}
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %}
+
+<!-- 
+File: ./anubis/info.html
+
+Copyright (c) Phantom Cyber Corporation, 2014-2016
+
+This unpublished material is proprietary to Phantom Cyber.
+All rights reserved. The methods and
+techniques described herein are considered trade secrets
+and/or confidential. Reproduction or distribution, in whole
+or in part, is forbidden except by express written permission
+of Phantom Cyber.
+-->
+
+<style>
+  .sandbox-info {
+    min-width: 250px;
+    display: inline-block;
+    padding-right: 30px;
+    white-space: nowrap;
+    height: 2em;
+    text-align: left;
+  }
+</style>
+
+{% for info in data %}
+<div class="panel">
+  <div class="panel-title">
+    <h3>{{ info.phantom_type|title }} Analysis</h3>
+  </div>
+  <div class="panel-body">
+    {% if info.phantom_type == 'file' %}
+      <div class="sandbox-info">File Name: &nbsp;{{ info.phantom_target.phantom_filename }}</div>
+    {% else %}
+      <div class="sandbox-info">URL: &nbsp;{{ info.phantom_target.phantom_url }}</div>
+    {% endif %}
+    <br>
+    <div class="sandbox-info">Report Created: &nbsp;{{ info.configuration.report_created|human_datetime }}</div>
+    <div class="sandbox-info">Duration: {{ info.configuration.time_needed }} seconds</div><br>
+    {% if info.phantom_type == 'file' %}
+    <div class="sandbox-info">MD5: &nbsp;{{ info.phantom_target.general.md5 }}</div><br>
+    <div class="sandbox-info">SHA1: &nbsp;{{ info.phantom_target.general.sha1 }}</div><br>
+    <div class="sandbox-info">File Size: &nbsp;{{ info.phantom_target.general.file_size }}</div>
+    {% endif %}
+    <div class="sandbox-info">Source Link: &nbsp;<a href="{{ info.phantom_results_url }}" target="_blank">Task {{ info.phantom_task_id }}</a></div>
+  </div>
+</div>
+<div class="panel">
+  <div class="panel-title">
+    <h3>Detection Flags</h3>
+  </div>
+  <div class="panel-body">
+    {% for flag, value in info.summary.items %}
+      <div class="sandbox-info">{{ flag|title }}: &nbsp;{{ value }}</div>
+    {% endfor %}
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+

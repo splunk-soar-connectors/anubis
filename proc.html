@@ -1,0 +1,222 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block title_color %}{{ title_color|default:'white' }}{% endblock %}
+{% block title_text_color %}{{ title_text_color|default:'rgb(101, 71, 150)' }}{% endblock %}
+{% block body_color %}{{ body_color|default:'white' }}{% endblock %}
+{% block body_text_color %}{{ body_text_color|default:'black' }}{% endblock %}
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+{% block widget_content %}
+
+<!-- 
+File: proc.html
+
+Copyright (c) Phantom Cyber Corporation, 2014-2016
+
+This unpublished material is proprietary to Phantom Cyber.
+All rights reserved. The methods and
+techniques described herein are considered trade secrets
+and/or confidential. Reproduction or distribution, in whole
+or in part, is forbidden except by express written permission
+of Phantom Cyber.
+-->
+
+<style>
+  #anubis-processes .hover {
+    cursor: pointer;
+  }
+  .anubis-param {
+    display: inline-block;
+    padding-right: 15px;
+    width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    overflow-text: ellipsis;
+  }
+</style>
+<div style="overflow: auto; width: 100%; height: 100%;">
+{% for item in data %}
+<h3>DLLs Loaded <button class="btn btn-phantom" type="button" onclick="$(this).parent().next().toggleClass('hidden'); $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button></h3>
+<table id="anubis-dll" style="min-width: 100%; margin: 0px;">
+<thead>
+  <th>DLL NAME</th>
+  <th>FULL_PATH</th>
+  <th>SIZE</th>
+  <th>BASE ADDRESS</th>
+</thead>
+<tbody>
+  {% for dll in item.dll_dependencies.loaded_dll|dictsort:'@base_name' %}
+    <tr>
+      <td>{{ dll|by_key:'@base_name' }}</td>
+      <td>{{ dll|by_key:'@full_name' }}</td>
+      <td>{{ dll|by_key:'@size' }}</td>
+      <td>{{ dll|by_key:'@base_address' }}</td>
+    </tr>
+  {% endfor %}
+</tbody>
+</table>
+<h3>File Access <button class="btn btn-phantom" type="button" onclick="$(this).parent().next().toggleClass('hidden'); $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button></h3>
+<table id="anubis-file" style="min-width: 100%; margin: 0px;">
+<thead>
+  <th>NAME</th>
+  <th>ACCESS</th>
+</thead>
+<tbody>
+  {% for entry in item.activities.file_activities.file_read %}
+    <tr>
+      <td>{{ entry|by_key:'@name' }}</td>
+      <td>Read</td>
+    </tr>
+  {% endfor %}
+  {% for entry in item.activities.file_activities.file_modified %}
+    <tr>
+      <td>{{ entry|by_key:'@name' }}</td>
+      <td>Modified</td>
+    </tr>
+  {% endfor %}
+</tbody>
+</table>
+<h3>Mutexes <button class="btn btn-phantom" type="button" onclick="$(this).parent().next().toggleClass('hidden'); $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button></h3>
+<table id="anubis-mutex" style="min-width: 100%; margin: 0px;">
+<thead>
+  <th>NAME</th>
+</thead>
+<tbody>
+  {% for entry in item.activities.misc_activities.mutex_created %}
+    <tr>
+      <td>{{ entry|by_key:'@name' }}</td>
+    </tr>
+  {% endfor %}
+</tbody>
+</table>
+<h3>Registry Access <button class="btn btn-phantom" type="button" onclick="$(this).parent().next().toggleClass('hidden'); $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button></h3>
+<table id="anubis-registry" style="min-width: 100%; margin: 0px;">
+<thead>
+  <th>VALUE NAME</th>
+  <th>KEY NAME</th>
+  <th>ACCESS</th>
+  <th>VALUE/MONITOR</th>
+</thead>
+<tbody>
+  {% for entry in item.activities.registry_activities.reg_value_modified %}
+    <tr>
+      <td>{{ entry|by_key:'@value_name' }}</td>
+      <td>{{ entry|by_key:'@key' }}</td>
+      <td>Modified</td>
+      <td>{{ entry|by_key:'@value_data' }}</td>
+    </tr>
+  {% endfor %}
+  {% for entry in item.activities.registry_activities.reg_value_read %}
+    <tr>
+      <td>{{ entry|by_key:'@value_name' }}</td>
+      <td>{{ entry|by_key:'@key' }}</td>
+      <td>Read</td>
+      <td>{{ entry|by_key:'@value_data' }}</td>
+    </tr>
+  {% endfor %}
+  {% for entry in item.activities.registry_activities.reg_value_read %}
+    <tr>
+      <td>{{ entry|by_key:'@value_name' }}</td>
+      <td>{{ entry|by_key:'@key' }}</td>
+      <td>Monitor</td>
+      <td>{{ entry|by_key:'@notify_filter' }}</td>
+    </tr>
+  {% endfor %}
+</tbody>
+</table>
+<h3>Exceptions <button class="btn btn-phantom" type="button" onclick="$(this).parent().next().toggleClass('hidden'); $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button></h3>
+<table id="anubis-exception" style="min-width: 100%; margin: 0px;">
+<thead>
+  <th>NAME</th>
+  <th>COUNT</th>
+</thead>
+<tbody>
+  {% for entry in item.activities.misc_activities.exception_occurred %}
+    <tr>
+      <td>{{ entry|by_key:'@description' }}</td>
+      <td>{{ entry|by_key:'@count' }}</td>
+    </tr>
+  {% endfor %}
+</tbody>
+</table>
+<h3>Processes Created <button class="btn btn-phantom" type="button" onclick="$(this).parent().next().toggleClass('hidden'); $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button></h3>
+<table id="anubis-process" style="min-width: 100%; margin: 0px;">
+<thead>
+  <th>EXE NAME</th>
+  <th>COMMAND</th>
+</thead>
+<tbody>
+  {% for entry in item.activities.process_activities.process_created %}
+    <tr>
+      <td>{{ entry|by_key:'@exe_name'|default:'Not Provided' }}</td>
+      <td>{{ entry|by_key:'@cmd_line'|default:'Not Provided' }}</td>
+    </tr>
+  {% endfor %}
+</tbody>
+</table>
+<h3>Remote Access <button class="btn btn-phantom" type="button" onclick="$(this).parent().next().toggleClass('hidden'); $(this).text($(this).text() == 'HIDE' ? 'SHOW' : 'HIDE');">HIDE</button></h3>
+<table id="anubis-remote" style="min-width: 100%; margin: 0px;">
+<thead>
+  <th>PROCESS</th>
+  <th>OPERATION</th>
+</thead>
+<tbody>
+  {% for entry in item.activities.process_activities.foreign_mem_area_read %}
+    <tr>
+      <td>{{ entry|by_key:'@process' }}</td>
+      <td>Memory Read</td>
+    </tr>
+  {% endfor %}
+  {% for entry in item.activities.process_activities.foreign_mem_area_write %}
+    <tr>
+      <td>{{ entry|by_key:'@process' }}</td>
+      <td>Memory Write</td>
+    </tr>
+  {% endfor %}
+  {% for entry in item.activities.process_activities.remote_thread_created %}
+    <tr>
+      <td>{{ entry|by_key:'@process' }}</td>
+      <td>Create Remote Thead</td>
+    </tr>
+  {% endfor %}
+</tbody>
+</table>
+{% endfor %}
+</div>
+
+<script>
+  var anubis_static_tables = ['dll', 'file', 'mutex', 'registry', 'exception', 'process', 'remote'];
+  for (var i in anubis_static_tables) {
+    var tbl = $('#anubis-' + anubis_static_tables[i]);
+    var datatbl = $(tbl).dataTable({
+      scrollX: 1,
+      scrollY: 2,
+      paging: false,
+      searching: false,
+      order: [],
+      bAutoWidth: false,
+      infoCallback: function() { return ''; },
+    });
+    tbl[0].ph_datatable = datatbl;
+    $(tbl).attr('onwidgetresize', 'anubis_behavior_resize_table(this);');
+    anubis_behavior_resize_table(tbl);
+    // Hack: table is not fully layed out at this point. Scheduling a redraw in 1 sec.
+    window.setTimeout(function() { anubis_behavior_resize_table(tbl) }, 1000);
+  }
+
+function anubis_behavior_resize_table(table) {
+  var scroll_body = $(table).parent();
+  var new_height = $(table).height() + 20;
+  scroll_body.css('height', new_height + 'px');
+  $(table).css('width', $(table).parent().parent().parent().parent().width() - 20);
+  new_height = $(table).height() + 20;
+  scroll_body.css('height', new_height + 'px');
+  $(table)[0].ph_datatable.fnAdjustColumnSizing();
+}
+</script>
+{% endblock %}
+
