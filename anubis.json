@@ -1,11 +1,11 @@
 {
-    "appid"    : "a76a681c-aed4-4b58-944d-1313328d3770",
-    "name"   : "Anubis",
+    "appid": "a76a681c-aed4-4b58-944d-1313328d3770",
+    "name": "Anubis",
     "description": "This app supports executing investigative actions like 'detonate file' and 'detonate url' to analyze executables and URLs on the online Anubis Malware Analysis tool.",
     "type": "sandbox",
     "main_module": "anubis_connector.pyc",
-    "app_version": "1.2.19",
-    "utctime_updated": "2017-04-29T02:30:25.000000Z",
+    "app_version": "1.2.20",
+    "utctime_updated": "2017-12-19T23:39:58.000000Z",
     "package_name": "phantom_anubis",
     "product_vendor": "Anubis",
     "product_name": "Anubis",
@@ -16,170 +16,190 @@
     "uber_view": "anubis_view.all_results",
     "license": "Copyright (c) Phantom Cyber Corporation 2015",
     "configuration": {
-      "timeout": {
-        "data_type": "numeric",
-        "description": "Timeout (seconds)",
-        "required": true
-      }
+        "timeout": {
+            "data_type": "numeric",
+            "description": "Timeout (seconds)",
+            "required": true
+        }
     },
     "actions": [
-      {
-        "action": "detonate file",
-        "description": "Run the file in the Anubis sandbox and retrieve the analysis results.",
-        "verbose": "This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter",
-        "type": "investigate",
-        "identifier": "detonate file",
-        "read_only": true,
-        "lock": {
-          "enabled": false
+        {
+            "action": "detonate file",
+            "description": "Run the file in the Anubis sandbox and retrieve the analysis results.",
+            "verbose": "This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter",
+            "type": "investigate",
+            "identifier": "detonate file",
+            "read_only": true,
+            "lock": {
+                "enabled": false
+            },
+            "parameters": {
+                "vault_id": {
+                    "description": "Vault ID of file to detonate",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "pe file"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "file_name": {
+                    "description": "Filename to use",
+                    "verbose": "This value will be passed to the sandbox as the name of the file that is pickup up from the vault",
+                    "data_type": "string",
+                    "order": 1,
+                    "contains": [
+                        "file name"
+                    ],
+                    "required": false
+                },
+                "force_analysis": {
+                    "description": "Force re-run of sample",
+                    "data_type": "boolean",
+                    "order": 2,
+                    "default": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.summary.id",
+                    "data_type": "string",
+                    "contains": [
+                        "anubis task id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.results_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.target",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "anubis_view.all_results",
+                "title": "DETONATE FILE"
+            },
+            "versions": "EQ(*)"
         },
-        "parameters": {
-          "vault_id": {
-            "description": "Vault ID of file to detonate",
-            "data_type": "string",
-            "order": 0,
-            "contains": ["pe file"],
-            "required": true,
-            "primary": true
-          },
-          "file_name": {
-            "description": "Filename to use",
-            "verbose": "This value will be passed to the sandbox as the name of the file that is pickup up from the vault",
-            "data_type": "string",
-            "order": 1,
-            "contains": ["file name"],
-            "required": false
-          },
-          "force_analysis": {
-            "description": "Force re-run of sample",
-            "data_type": "boolean",
-            "order": 2,
-            "default": false
-          }
+        {
+            "action": "get report",
+            "description": "Query for results of an already completed task in Anubis.",
+            "type": "investigate",
+            "identifier": "get report",
+            "read_only": true,
+            "lock": {
+                "enabled": false
+            },
+            "parameters": {
+                "id": {
+                    "description": "Task ID to get the results of",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "anubis task id"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.summary.id",
+                    "data_type": "string",
+                    "contains": [
+                        "anubis task id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.results_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.target",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "anubis_view.all_results",
+                "title": "DETONATION RESULTS"
+            },
+            "versions": "EQ(*)"
         },
-        "output": [
-          {
-            "data_path":"action_result.summary.id",
-            "data_type":"string",
-            "contains":["anubis task id"]
-          },
-          {
-            "data_path":"action_result.summary.results_url",
-            "data_type":"string"
-          },
-          {
-            "data_path":"action_result.summary.target",
-            "data_type":"string",
-            "contains":["file name"]
-          }
-        ],
-        "render": {
-          "type": "custom",
-          "width": 10,
-          "height": 5,
-          "view": "anubis_view.all_results",
-          "title": "DETONATE FILE"
+        {
+            "action": "detonate url",
+            "description": "Load a URL in the Anubis sandbox and retrieve the analysis results.",
+            "type": "investigate",
+            "identifier": "detonate url",
+            "read_only": true,
+            "lock": {
+                "enabled": false
+            },
+            "parameters": {
+                "url": {
+                    "description": "URL to detonate",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.summary.id",
+                    "data_type": "string",
+                    "contains": [
+                        "anubis task id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.results_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.target",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "anubis_view.all_results",
+                "title": "DETONATE URL"
+            },
+            "versions": "EQ(*)"
         },
-        "versions":"EQ(*)"
-      },
-      {
-        "action": "get report",
-        "description": "Query for results of an already completed task in Anubis.",
-        "type": "investigate",
-        "identifier": "get report",
-        "read_only": true,
-        "lock": {
-          "enabled": false
-        },
-        "parameters": {
-          "id": {
-            "description": "Task ID to get the results of",
-            "data_type": "string",
-            "order": 0,
-            "contains": ["anubis task id"],
-            "required": true,
-            "primary": true
-          }
-        },
-        "output": [
-          {
-            "data_path":"action_result.summary.id",
-            "data_type":"string",
-            "contains":["anubis task id"]
-          },
-          {
-            "data_path":"action_result.summary.results_url",
-            "data_type":"string"
-          },
-          {
-            "data_path":"action_result.summary.target",
-            "data_type":"string",
-            "contains":["file name"]
-          }
-        ],
-        "render": {
-          "type": "custom",
-          "width": 10,
-          "height": 5,
-          "view": "anubis_view.all_results",
-          "title": "DETONATION RESULTS"
-        },
-        "versions":"EQ(*)"
-      },
-      {
-        "action": "detonate url",
-        "description": "Load a URL in the Anubis sandbox and retrieve the analysis results.",
-        "type": "investigate",
-        "identifier": "detonate url",
-        "read_only": true,
-        "lock": {
-          "enabled": false
-        },
-        "parameters": {
-          "url": {
-            "description": "URL to detonate",
-            "data_type": "string",
-            "order": 0,
-            "contains": ["url", "domain"],
-            "required": true,
-            "primary": true
-          }
-        },
-        "output": [
-          {
-            "data_path":"action_result.summary.id",
-            "data_type":"string",
-            "contains":["anubis task id"]
-          },
-          {
-            "data_path":"action_result.summary.results_url",
-            "data_type":"string"
-          },
-          {
-            "data_path":"action_result.summary.target",
-            "data_type":"string",
-            "contains":["file name"]
-          }
-        ],
-        "render": {
-          "type": "custom",
-          "width": 10,
-          "height": 5,
-          "view": "anubis_view.all_results",
-          "title": "DETONATE URL"
-        },
-        "versions":"EQ(*)"
-      },
-      {
-        "action": "test connectivity",
-        "description": "This action connects to the server to verify the connection.",
-        "type": "test",
-        "identifier": "test_asset_connectivity",
-        "read_only": true,
-        "parameters": {
-        },
-        "output": [],
-        "versions":"EQ(*)"
-      }
+        {
+            "action": "test connectivity",
+            "description": "This action connects to the server to verify the connection.",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        }
     ]
 }
